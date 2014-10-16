@@ -40,7 +40,9 @@
   <ItemGroup>
     <Compile Include="Classes\DataSourceResult.cs" />
     <Compile Include="Classes\Filter.cs" />
+    <Compile Include="Classes\ParameterRebinder.cs" />
     <Compile Include="Extensions\DynamicQueryable.cs" />
+    <Compile Include="Extensions\LinqExtender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Classes\Sort.cs" />
