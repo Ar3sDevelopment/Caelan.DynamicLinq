@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Caelan.DynamicLinq</id>
+        <version>1.2.0</version>
+        <title>Caelan.DynamicLinq</title>
+        <authors>Caelan</authors>
+        <owners>Caelan</owners>
+        <projectUrl>http://github.com/Ar3sDevelopment/Caelan.DynamicLinq</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Personal implementations for Kendo.DynamicLinq</description>
+    </metadata>
+    <files>
+        <file src="lib\Caelan.DynamicLinq.dll" target="lib\Caelan.DynamicLinq.dll" />
+    </files>
+</package>
