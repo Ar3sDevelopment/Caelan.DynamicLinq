@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="Caelan.DynamicLinq/Caelan.DynamicLinq.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Caelan.DynamicLinq/Caelan.DynamicLinq.nuspec">
+    <Files>
+      <File FileName="Caelan.DynamicLinq/Caelan.DynamicLinq.nuspec" Line="32" Column="32" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

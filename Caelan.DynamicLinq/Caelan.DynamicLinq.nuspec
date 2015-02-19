@@ -11,6 +11,6 @@
         <description>Personal implementations for Kendo.DynamicLinq</description>
     </metadata>
     <files>
-        <file src="lib\Caelan.DynamicLinq.dll" target="lib\Caelan.DynamicLinq.dll" />
+        <file src="bin\Release\Caelan.DynamicLinq.dll" target="lib\Caelan.DynamicLinq.dll" />
     </files>
 </package>
