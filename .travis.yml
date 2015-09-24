@@ -1,6 +1,6 @@
 language: csharp
 solution: Caelan.DynamicLinq.sln
 install:
-  - nuget restore Caelan.DyamicLinq.sln
+  - nuget restore Caelan.DynamicLinq.sln
 script:
   - xbuild /p:Configuration=Release Caelan.DynamicLinq.sln
