@@ -27,7 +27,7 @@ namespace Caelan.DynamicLinq.Extensions
 			};
 		}
 
-		private static IQueryable<T> Filter<T>(this IQueryable<T> queryable, Filter filter)
+		public static IQueryable<T> Filter<T>(this IQueryable<T> queryable, Filter filter)
 		{
 			if (filter == null || filter.Logic == null) return queryable;
 
@@ -40,7 +40,7 @@ namespace Caelan.DynamicLinq.Extensions
 			return queryable;
 		}
 
-		private static IQueryable<T> Sort<T>(this IQueryable<T> queryable, IEnumerable<Sort> sort)
+		public static IQueryable<T> Sort<T>(this IQueryable<T> queryable, IEnumerable<Sort> sort)
 		{
 			if (sort == null) return queryable;
 
@@ -53,7 +53,7 @@ namespace Caelan.DynamicLinq.Extensions
 			return queryable.OrderBy(ordering);
 		}
 
-		private static IQueryable<T> Page<T>(this IQueryable<T> queryable, int take, int skip)
+		public static IQueryable<T> Page<T>(this IQueryable<T> queryable, int take, int skip)
 		{
 			return queryable.Skip(skip).Take(take);
 		}
