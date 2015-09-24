@@ -1,4 +1,4 @@
-﻿<Properties StartupItem="Caelan.DynamicLinq/Caelan.DynamicLinq.csproj">
+﻿<Properties StartupItem="Caelan.DynamicLinq/Caelan.DynamicLinq.csproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Caelan.DynamicLinq/Caelan.DynamicLinq.nuspec">
     <Files>
