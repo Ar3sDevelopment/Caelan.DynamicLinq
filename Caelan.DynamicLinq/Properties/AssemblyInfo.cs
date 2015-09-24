@@ -7,7 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Caelan.DynamicLinq")]
 [assembly: AssemblyDescription("Server side paging, sorting and filtering via Dynamic Linq")]
 [assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Caelan")]
 [assembly: AssemblyProduct("Caelan.DynamicLinq")]
+[assembly: AssemblyCopyright("Caelan © 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,4 +31,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.*")]
+[assembly: AssemblyVersion("1.2.*")]
