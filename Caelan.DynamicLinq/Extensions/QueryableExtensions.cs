@@ -24,21 +24,21 @@ namespace Caelan.DynamicLinq.Extensions
 		public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter, IEnumerable<Aggregator> aggregates)
 		{
 			// Filter the data first
-			queryable = Filter(queryable, filter);
+			queryable = queryable.Filter(filter);
 
 			// Calculate the total number of records (needed for paging)
 			var total = queryable.Count();
 
 			// Calculate the aggregates
-			var aggregate = Aggregate(queryable, aggregates);
+			var aggregate = queryable.Aggregate(aggregates);
 
 			// Sort the data
-			queryable = Sort(queryable, sort);
+			queryable = queryable.Sort(sort);
 
 			// Finally page the data
 			if (take > 0) 
             {
-				queryable = Page(queryable, take, skip);
+				queryable = queryable.Page(take, skip);
 			}
 
 			return new DataSourceResult<T>
