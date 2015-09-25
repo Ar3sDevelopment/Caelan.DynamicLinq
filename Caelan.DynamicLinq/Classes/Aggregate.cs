@@ -40,14 +40,12 @@ namespace Caelan.DynamicLinq.Classes
 					return GetMethod(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Aggregate), MinMaxFunc().Method, 2).MakeGenericMethod(type, proptype);
 				case "average":
 				case "sum":
-					return GetMethod(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Aggregate), 
-						((Func<Type, Type[]>)this.GetType().GetMethod("SumAvgFunc", BindingFlags.Static | BindingFlags.NonPublic)
-						.MakeGenericMethod(proptype).Invoke(null, null)).Method, 1).MakeGenericMethod(type);
+					return GetMethod(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Aggregate), ((Func<Type, Type[]>)GetType().GetMethod("SumAvgFunc", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(proptype).Invoke(null, null)).Method, 1).MakeGenericMethod(type);
 				case "count":
-					return GetMethod(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Aggregate),
-						Nullable.GetUnderlyingType(proptype) != null ? CountNullableFunc().Method : CountFunc().Method, 1).MakeGenericMethod(type);
+					return GetMethod(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Aggregate), Nullable.GetUnderlyingType(proptype) != null ? CountNullableFunc().Method : CountFunc().Method, 1).MakeGenericMethod(type);
+				default:
+					return null;
 			}
-			return null;
 		}
 
 		private static MethodInfo GetMethod(string methodName, MethodInfo methodTypes, int genericArgumentsCount)
@@ -57,7 +55,7 @@ namespace Caelan.DynamicLinq.Classes
 						  let genericArguments = method.GetGenericArguments()
 						  where method.Name == methodName &&
 							genericArguments.Length == genericArgumentsCount &&
-							parameters.Select(p => p.ParameterType).SequenceEqual((Type[])methodTypes.Invoke(null, genericArguments))
+							parameters.Select(p => p.ParameterType).SequenceEqual((Type[])methodTypes.Invoke(null, genericArguments.Cast<object>().ToArray()))
 						  select method;
 			return methods.FirstOrDefault();
 		}
@@ -66,7 +64,7 @@ namespace Caelan.DynamicLinq.Classes
 		{
 			return CountNullableDelegate;
 		}
-		
+
 		private static Type[] CountNullableDelegate(Type t)
 		{
 			return new[]
@@ -78,9 +76,9 @@ namespace Caelan.DynamicLinq.Classes
 
 		private static Func<Type, Type[]> CountFunc()
 		{
-			return (T) => new[]
+			return t => new[]
 				{
-					typeof(IQueryable<>).MakeGenericType(T)
+					typeof(IQueryable<>).MakeGenericType(t)
 				};
 		}
 
@@ -88,7 +86,7 @@ namespace Caelan.DynamicLinq.Classes
 		{
 			return MinMaxDelegate;
 		}
-		
+
 		private static Type[] MinMaxDelegate(Type a, Type b)
 		{
 			return new[]
@@ -98,17 +96,17 @@ namespace Caelan.DynamicLinq.Classes
 				};
 		}
 
-		private static Func<Type, Type[]> SumAvgFunc<U>()
+		private static Func<Type, Type[]> SumAvgFunc<T>()
 		{
-			return SumAvgDelegate<U>;
+			return SumAvgDelegate<T>;
 		}
-		
-		private static Type[] SumAvgDelegate<U>(Type t)
+
+		private static Type[] SumAvgDelegate<T>(Type t)
 		{
 			return new[]
 				{
 					typeof (IQueryable<>).MakeGenericType(t),
-					typeof (Expression<>).MakeGenericType(typeof (Func<,>).MakeGenericType(t, typeof(U)))
+					typeof (Expression<>).MakeGenericType(typeof (Func<,>).MakeGenericType(t, typeof(T)))
 				};
 		}
 	}

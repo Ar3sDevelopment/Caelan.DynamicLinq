@@ -21,7 +21,7 @@ namespace Caelan.DynamicLinq.Extensions
 		/// <param name="filter">Specifies the current filter.</param>
 		/// <param name="aggregates">Specifies the current aggregates.</param>
 		/// <returns>A DataSourceResult object populated from the processed IQueryable.</returns>
-		public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter, IEnumerable<Aggregator> aggregates)
+		public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, int take, int skip, ICollection<Sort> sort, Filter filter, ICollection<Aggregator> aggregates)
 		{
 			// Filter the data first
 			queryable = queryable.Filter(filter);
@@ -36,8 +36,8 @@ namespace Caelan.DynamicLinq.Extensions
 			queryable = queryable.Sort(sort);
 
 			// Finally page the data
-			if (take > 0) 
-            {
+			if (take > 0)
+			{
 				queryable = queryable.Page(take, skip);
 			}
 
@@ -59,107 +59,99 @@ namespace Caelan.DynamicLinq.Extensions
 		/// <param name="sort">Specifies the current sort order.</param>
 		/// <param name="filter">Specifies the current filter.</param>
 		/// <returns>A DataSourceResult object populated from the processed IQueryable.</returns>
-		public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, int take, int skip, IEnumerable<Sort> sort, Filter filter)
+		public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, int take, int skip, ICollection<Sort> sort, Filter filter)
 		{
 			return queryable.ToDataSourceResult(take, skip, sort, filter, null);
 		}
 
-        /// <summary>
-        ///  Applies data processing (paging, sorting and filtering) over IQueryable using Dynamic Linq.
-        /// </summary>
-        /// <typeparam name="T">The type of the IQueryable.</typeparam>
-        /// <param name="queryable">The IQueryable which should be processed.</param>
-        /// <param name="request">The DataSourceRequest object containing take, skip, order, and filter data.</param>
-        /// <returns>A DataSourceResult object populated from the processed IQueryable.</returns>
-	    public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, DataSourceRequest request)
-	    {
-	        return queryable.ToDataSourceResult(request.Take, request.Skip, request.Sort, request.Filter, null);
-	    }
+		/// <summary>
+		///  Applies data processing (paging, sorting and filtering) over IQueryable using Dynamic Linq.
+		/// </summary>
+		/// <typeparam name="T">The type of the IQueryable.</typeparam>
+		/// <param name="queryable">The IQueryable which should be processed.</param>
+		/// <param name="request">The DataSourceRequest object containing take, skip, order, and filter data.</param>
+		/// <returns>A DataSourceResult object populated from the processed IQueryable.</returns>
+		public static DataSourceResult<T> ToDataSourceResult<T>(this IQueryable<T> queryable, DataSourceRequest request)
+		{
+			return queryable.ToDataSourceResult(request.Take, request.Skip, request.Sort, request.Filter, null);
+		}
 
 		public static IQueryable<T> Filter<T>(this IQueryable<T> queryable, Filter filter)
 		{
-			if (filter != null && filter.Logic != null)
-			{
-				// Collect a flat list of all filters
-				var filters = filter.All();
+			if (filter?.Logic == null) return queryable;
 
-				// Get all filter values as array (needed by the Where method of Dynamic Linq)
-				var values = filters.Select(f => f.Value).ToArray();
+			// Collect a flat list of all filters
+			var filters = filter.All();
 
-				// Create a predicate expression e.g. Field1 = @0 And Field2 > @1
-				string predicate = filter.ToExpression(filters);
+			// Get all filter values as array (needed by the Where method of Dynamic Linq)
+			var values = filters.Select(f => f.Value).ToArray();
 
-				// Use the Where method of Dynamic Linq to filter the data
-				queryable = queryable.Where(predicate, values);
-			}
+			// Create a predicate expression e.g. Field1 = @0 And Field2 > @1
+			string predicate = filter.ToExpression(filters);
+
+			// Use the Where method of Dynamic Linq to filter the data
+			queryable = queryable.Where(predicate, values);
 
 			return queryable;
 		}
 
-		public static object Aggregate<T>(this IQueryable<T> queryable, IEnumerable<Aggregator> aggregates)
+		public static object Aggregate<T>(this IQueryable<T> queryable, ICollection<Aggregator> aggregates)
 		{
-			if (aggregates != null && aggregates.Any())
+			if (aggregates == null || !aggregates.Any()) return null;
+
+			var objProps = new Dictionary<DynamicProperty, object>();
+			var groups = aggregates.GroupBy(g => g.Field);
+			Type type;
+
+			foreach (var group in groups)
 			{
-				var objProps = new Dictionary<DynamicProperty, object>();
-				var groups = aggregates.GroupBy(g => g.Field);
-				Type type = null;
-				foreach (var group in groups)
+				var fieldProps = new Dictionary<DynamicProperty, object>();
+				foreach (var aggregate in @group)
 				{
-					var fieldProps = new Dictionary<DynamicProperty, object>();
-					foreach (var aggregate in group)
-					{
-						var prop = typeof (T).GetProperty(aggregate.Field);
-						var param = Expression.Parameter(typeof (T), "s");
-						var selector = aggregate.Aggregate == "count" && (Nullable.GetUnderlyingType(prop.PropertyType) != null)
-							? Expression.Lambda(Expression.NotEqual(Expression.MakeMemberAccess(param, prop), Expression.Constant(null, prop.PropertyType)), param)
-							: Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);
-						var mi = aggregate.MethodInfo(typeof (T));
-						if (mi == null)
-							continue;
+					var prop = typeof(T).GetProperty(aggregate.Field);
+					var param = Expression.Parameter(typeof(T), "s");
+					var selector = aggregate.Aggregate == "count" && (Nullable.GetUnderlyingType(prop.PropertyType) != null)
+						? Expression.Lambda(Expression.NotEqual(Expression.MakeMemberAccess(param, prop), Expression.Constant(null, prop.PropertyType)), param)
+						: Expression.Lambda(Expression.MakeMemberAccess(param, prop), param);
+					var mi = aggregate.MethodInfo(typeof(T));
+					if (mi == null)
+						continue;
 
-						var val = queryable.Provider.Execute(Expression.Call(null, mi,
-							aggregate.Aggregate == "count" && (Nullable.GetUnderlyingType(prop.PropertyType) == null)
-								? new[] { queryable.Expression }
-								: new[] { queryable.Expression, Expression.Quote(selector) }));
+					var val = queryable.Provider.Execute(Expression.Call(null, mi,
+						aggregate.Aggregate == "count" && (Nullable.GetUnderlyingType(prop.PropertyType) == null)
+							? new[] { queryable.Expression }
+							: new[] { queryable.Expression, Expression.Quote(selector) }));
 
-						fieldProps.Add(new DynamicProperty(aggregate.Aggregate, typeof(object)), val);
-					}
-					type = DynamicExpression.CreateClass(fieldProps.Keys);
-					var fieldObj = Activator.CreateInstance(type);
-					foreach (var p in fieldProps.Keys)
-						type.GetProperty(p.Name).SetValue(fieldObj, fieldProps[p], null);
-					objProps.Add(new DynamicProperty(group.Key, fieldObj.GetType()), fieldObj);
+					fieldProps.Add(new DynamicProperty(aggregate.Aggregate, typeof(object)), val);
 				}
-
-				type = DynamicExpression.CreateClass(objProps.Keys);
-
-				var obj = Activator.CreateInstance(type);
-
-				foreach (var p in objProps.Keys)
-                {
-					type.GetProperty(p.Name).SetValue(obj, objProps[p], null);
-                }
-
-				return obj;
+				type = DynamicExpression.CreateClass(fieldProps.Keys);
+				var fieldObj = Activator.CreateInstance(type);
+				foreach (var p in fieldProps.Keys)
+					type.GetProperty(p.Name).SetValue(fieldObj, fieldProps[p], null);
+				objProps.Add(new DynamicProperty(@group.Key, fieldObj.GetType()), fieldObj);
 			}
-            else
-            {
-                return null;
-            }
+
+			type = DynamicExpression.CreateClass(objProps.Keys);
+
+			var obj = Activator.CreateInstance(type);
+
+			foreach (var p in objProps.Keys)
+			{
+				type.GetProperty(p.Name).SetValue(obj, objProps[p], null);
+			}
+
+			return obj;
 		}
 
-		public static IQueryable<T> Sort<T>(this IQueryable<T> queryable, IEnumerable<Sort> sort)
+		public static IQueryable<T> Sort<T>(this IQueryable<T> queryable, ICollection<Sort> sort)
 		{
-			if (sort != null && sort.Any())
-			{
-				// Create ordering expression e.g. Field1 asc, Field2 desc
-				var ordering = String.Join(",", sort.Select(s => s.ToExpression()));
+			if (sort == null || !sort.Any()) return queryable;
 
-				// Use the OrderBy method of Dynamic Linq to sort the data
-				return queryable.OrderBy(ordering);
-			}
+			// Create ordering expression e.g. Field1 asc, Field2 desc
+			var ordering = string.Join(",", sort.Select(s => s.ToExpression()));
 
-			return queryable;
+			// Use the OrderBy method of Dynamic Linq to sort the data
+			return queryable.OrderBy(ordering);
 		}
 
 		public static IQueryable<T> Page<T>(this IQueryable<T> queryable, int take, int skip)

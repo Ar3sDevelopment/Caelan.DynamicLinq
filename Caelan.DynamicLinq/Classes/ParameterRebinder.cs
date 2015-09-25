@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Collections.Generic;
-using Caelan.DynamicLinq.Classes;
 
 namespace Caelan.DynamicLinq.Classes
 {
@@ -23,7 +21,7 @@ namespace Caelan.DynamicLinq.Classes
 		{
 			ParameterExpression replacement;
 
-			if (_map.TryGetValue (p, out replacement))
+			if (_map.TryGetValue(p, out replacement))
 			{
 				p = replacement;
 			}

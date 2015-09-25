@@ -20,7 +20,7 @@ namespace Caelan.DynamicLinq.Classes
         /// <summary>
         /// Specifies the requested sort order.
         /// </summary>
-        public IEnumerable<Sort> Sort { get; set; }
+        public ICollection<Sort> Sort { get; set; }
 
         /// <summary>
         /// Specifies the requested filter.
