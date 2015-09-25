@@ -9,13 +9,13 @@
 		<projectUrl>http://github.com/Ar3sDevelopment/Caelan.DynamicLinq</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>$description$</description>
+		<dependencies>
+			<group targetFramework=".NETFramework4.5">
+				<dependency id="System.Linq.Dynamic" version="1.0.4" />
+			</group>
+		</dependencies>
 	</metadata>
 	<files>
 		<file src="bin\$configuration$\$id$.dll" target="lib\$id$.dll" />
 	</files>
-	<dependencies>
-		<group targetFramework=".NETFramework4.5">
-			<dependency id="System.Linq.Dynamic" version="1.0.4" />
-		</group>
-	</dependencies>
 </package>
