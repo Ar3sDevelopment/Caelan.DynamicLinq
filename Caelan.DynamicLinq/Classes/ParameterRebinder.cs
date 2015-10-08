@@ -9,7 +9,7 @@ namespace Caelan.DynamicLinq.Classes
 
 		public ParameterRebinder(Dictionary<ParameterExpression, ParameterExpression> map)
 		{
-			_map = _map ?? new Dictionary<ParameterExpression, ParameterExpression>();
+			_map = map ?? new Dictionary<ParameterExpression, ParameterExpression>();
 		}
 
 		public static Expression ReplaceParameters(Dictionary<ParameterExpression, ParameterExpression> map, Expression exp)
