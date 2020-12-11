@@ -27,7 +27,7 @@ namespace Caelan.DynamicLinq.Classes
 		/// <summary>
 		/// The total number of records available.
 		/// </summary>
-		public int Total { get; set; }
+		public long Total { get; set; }
 
 		/// <summary>
 		/// Represents a requested aggregates.

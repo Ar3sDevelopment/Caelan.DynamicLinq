@@ -27,7 +27,7 @@ namespace Caelan.DynamicLinq.Extensions
 			queryable = queryable.Filter(filter);
 
 			// Calculate the total number of records (needed for paging)
-			var total = queryable.Count();
+			var total = queryable.LongCount();
 
 			// Calculate the aggregates
 			var aggregate = queryable.Aggregate(aggregates);
